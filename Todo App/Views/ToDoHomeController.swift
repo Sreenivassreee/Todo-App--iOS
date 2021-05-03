@@ -8,11 +8,11 @@
 import UIKit
 
 class ToDoHomeController: UITableViewController {
-var ToDoData=["Sree","Need to Eat","buy laptop"]
-    var textItem=""
-    
+    var ToDoData = ["Hi"]
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        ToDoData = []
         // Do any additional setup after loading the view.
     }
     
@@ -29,14 +29,21 @@ var ToDoData=["Sree","Need to Eat","buy laptop"]
     }
     
     @IBAction func AddPressed(_ sender: UIBarButtonItem) {
+        var textF=UITextField()
         let alert = UIAlertController(title: "Add New Item to list", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            print("Added" + self.textItem)
+            if let text=textF.text{
+                
+                self.ToDoData.append(text)
+                self.tableView.reloadData()
+              
+            }
+            
         }
         alert.addTextField { (textField) in
             textField.placeholder="Add New ToDo"
-            self.textItem=String(textField.text ?? "Nil")
+           textF=textField
         }
         alert.addAction(action)
         present(alert, animated: true,completion: nil)
