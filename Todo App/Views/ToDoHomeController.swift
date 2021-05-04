@@ -9,20 +9,21 @@ import UIKit
 
 class ToDoHomeController: UITableViewController {
     var ToDoData = ["Hi"]
+    var defaults = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        ToDoData = []
-        // Do any additional setup after loading the view.
+        if let data = defaults.array(forKey: "ToDoList") as? [String]{
+            ToDoData = data
+            print(data)
+            print(ToDoData)
+        }
     }
-    
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return ToDoData.count
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell",for: indexPath)
-
         cell.textLabel?.text=ToDoData[indexPath.row]
         return cell
         
@@ -36,6 +37,7 @@ class ToDoHomeController: UITableViewController {
             if let text=textF.text{
                 
                 self.ToDoData.append(text)
+                self.defaults.set(self.ToDoData, forKey: "ToDoList")
                 self.tableView.reloadData()
               
             }
