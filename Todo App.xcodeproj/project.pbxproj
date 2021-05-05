@@ -101,6 +101,7 @@
 		F44093E02642E5BD0002DB6D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F440942926430D500002DB6D /* CoreDataModel.xcdatamodeld */,
 				F44093D82642E5B90002DB6D /* Models.swift */,
 			);
 			path = Models;
@@ -135,7 +136,6 @@
 				F44093E02642E5BD0002DB6D /* Models */,
 				F49035CC264043B200CE4D77 /* Assets.xcassets */,
 				F49035D1264043B200CE4D77 /* Info.plist */,
-				F440942926430D500002DB6D /* CoreDataModel.xcdatamodeld */,
 			);
 			path = "Todo App";
 			sourceTree = "<group>";

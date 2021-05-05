@@ -6,10 +6,11 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoHomeController: UITableViewController {
     //    var EachTodo = EachToDo()
-    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var dataFilePath = FileManager.default.urls(for: .documentDirectory,in:.userDomainMask).first?.appendingPathComponent("Items.plist")
     var ToDoData = [EachToDo]()
     var defaults = UserDefaults.standard
@@ -17,7 +18,7 @@ class ToDoHomeController: UITableViewController {
         super.viewDidLoad()
         var item = EachToDo()
         print(dataFilePath)
-        fetchData()
+//        fetchData()
         
         //                if let data = defaults.array(forKey: "ToDoList") as? [String]{
         //                    ToDoData = data
@@ -31,8 +32,11 @@ class ToDoHomeController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             if let t=textF.text{
-                var item = EachToDo()
+               
+                var item = EachToDo(context:self.context)
+                
                 item.title=t
+                item.done=false
                 self.ToDoData.append(item)
                 self.SaveData()
                 self.tableView.reloadData()
@@ -81,26 +85,27 @@ class ToDoHomeController: UITableViewController {
     func SaveData() {
         let encoder = PropertyListEncoder()
         do{
-            let data = try encoder.encode(ToDoData)
-            try data.write(to: dataFilePath!)
+            try context.save()
+//            let data = try encoder.encode(ToDoData)
+//            try data.write(to: dataFilePath!)
         }catch{
             print("Error in encloding \(error)")
         }
         tableView.reloadData()
     }
-    func fetchData()  {
-        do {
-            if let data = try? Data(contentsOf:dataFilePath!){
-                
-                let decoder=PropertyListDecoder()
-                
-                ToDoData = try decoder.decode([EachToDo].self,from :data)
-           
-            }
-        }catch{
-            print("Error in Decoding")
-            
-        }
-    }
+//    func fetchData()  {
+//        do {
+//            if let data = try? Data(contentsOf:dataFilePath!){
+//
+//                let decoder=PropertyListDecoder()
+//
+//                ToDoData = try decoder.decode([EachToDo].self,from :data)
+//
+//            }
+//        }catch{
+//            print("Error in Decoding")
+//
+//        }
+//    }
 }
 
