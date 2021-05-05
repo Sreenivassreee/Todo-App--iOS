@@ -69,7 +69,7 @@ class ToDoHomeController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("indexPath")
-            print(indexPath)
+        print(indexPath)
         tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         //        tableView.deselectRow(at: indexPath, animated: true)
         
@@ -93,9 +93,9 @@ class ToDoHomeController: UITableViewController {
             if let data = try? Data(contentsOf:dataFilePath!){
                 
                 let decoder=PropertyListDecoder()
-               
+                
                 ToDoData = try decoder.decode([EachToDo].self,from :data)
-                tableView.reloadData()
+           
             }
         }catch{
             print("Error in Decoding")
