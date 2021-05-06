@@ -14,11 +14,19 @@ class ToDoHomeController: UITableViewController {
     var dataFilePath = FileManager.default.urls(for: .documentDirectory,in:.userDomainMask)
     var ToDoData = [EachToDo]()
     var defaults = UserDefaults.standard
+    var selectedCategory:Categery?{
+        didSet{
+            fetchData()
+        }
+    }
+
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         var item = EachToDo()
         print(dataFilePath)
-        fetchData()
+
         
         //                if let data = defaults.array(forKey: "ToDoList") as? [String]{
         //                    ToDoData = data
@@ -37,6 +45,7 @@ class ToDoHomeController: UITableViewController {
                 
                 item.title=t
                 item.done=false
+                item.parentCategery=self.selectedCategory
                 self.ToDoData.append(item)
                 self.SaveData()
                 self.tableView.reloadData()
@@ -75,34 +84,36 @@ class ToDoHomeController: UITableViewController {
         //        tableView.deselectRow(at: indexPath, animated: true)
         
         ToDoData[indexPath.row].done = !ToDoData[indexPath.row].done
-        
-//        context.delete(ToDoData[indexPath.row])
-//        ToDoData.remove(at: indexPath.row)
-        
-        
-        
+
         SaveData()
         
         
     }
     func SaveData() {
-        //        let encoder = PropertyListEncoder()
         do{
             try context.save()
-            //            let data = try encoder.encode(ToDoData)
-            //            try data.write(to: dataFilePath!)
+
         }catch{
             print("Error in encloding \(error)")
         }
         tableView.reloadData()
     }
-    func fetchData(with request:NSFetchRequest<EachToDo> = EachToDo.fetchRequest())  {
+    func fetchData(with request:NSFetchRequest<EachToDo> = EachToDo.fetchRequest(),predicate:NSPredicate? = nil)  {
+      
+            let CPredicate = NSPredicate(format: "parentCategery.name MATCHES %@", selectedCategory!.name!)
+            
+            if let additinalPredicate = predicate{
+                request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [CPredicate,additinalPredicate])
+                
+            }else{
+           
+                request.predicate = CPredicate
+            }
         do {
-//            let request: NSFetchRequest<EachToDo> = EachToDo.fetchRequest()
             ToDoData = try context.fetch(request)
-     
+//            let request: NSFetchRequest<EachToDo> = EachToDo.fetchRequest()
             
-            
+   
         }catch{
             print("Error in Decoding")
             
@@ -118,12 +129,20 @@ extension ToDoHomeController: UISearchBarDelegate{
          fetchData()
         }else{
         let request : NSFetchRequest<EachToDo> = EachToDo.fetchRequest()
-        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+       let  predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-        fetchData(with : request)
+        fetchData(with : request,predicate: predicate)
       
         }
         
+    }
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count==0{
+            fetchData()
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
     }
     
     
