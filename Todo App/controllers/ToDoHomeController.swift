@@ -96,16 +96,36 @@ class ToDoHomeController: UITableViewController {
         }
         tableView.reloadData()
     }
-    func fetchData()  {
+    func fetchData(with request:NSFetchRequest<EachToDo> = EachToDo.fetchRequest())  {
         do {
-            let request: NSFetchRequest<EachToDo> = EachToDo.fetchRequest()
+//            let request: NSFetchRequest<EachToDo> = EachToDo.fetchRequest()
             ToDoData = try context.fetch(request)
+     
             
             
         }catch{
             print("Error in Decoding")
             
         }
+        tableView.reloadData()
     }
 }
 
+extension ToDoHomeController: UISearchBarDelegate{
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if searchBar.text==""{
+         fetchData()
+        }else{
+        let request : NSFetchRequest<EachToDo> = EachToDo.fetchRequest()
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        fetchData(with : request)
+      
+        }
+        
+    }
+    
+    
+    
+}
