@@ -11,14 +11,14 @@ import CoreData
 class ToDoHomeController: UITableViewController {
     //    var EachTodo = EachToDo()
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    var dataFilePath = FileManager.default.urls(for: .documentDirectory,in:.userDomainMask).first?.appendingPathComponent("Items.plist")
+    var dataFilePath = FileManager.default.urls(for: .documentDirectory,in:.userDomainMask)
     var ToDoData = [EachToDo]()
     var defaults = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
         var item = EachToDo()
         print(dataFilePath)
-//        fetchData()
+        fetchData()
         
         //                if let data = defaults.array(forKey: "ToDoList") as? [String]{
         //                    ToDoData = data
@@ -32,7 +32,7 @@ class ToDoHomeController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             if let t=textF.text{
-               
+                
                 var item = EachToDo(context:self.context)
                 
                 item.title=t
@@ -40,11 +40,6 @@ class ToDoHomeController: UITableViewController {
                 self.ToDoData.append(item)
                 self.SaveData()
                 self.tableView.reloadData()
-                
-                
-                
-                //                self.defaults.set(self.ToDoData, forKey: "ToDoList")
-                
                 
             }
             
@@ -65,6 +60,7 @@ class ToDoHomeController: UITableViewController {
         cell.textLabel?.text=ToDoData[indexPath.row].title
         
         let item = ToDoData[indexPath.row]
+        
         cell.accessoryType = item.done ? .checkmark : .none
         
         return cell
@@ -74,38 +70,42 @@ class ToDoHomeController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("indexPath")
         print(indexPath)
+        
         tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         //        tableView.deselectRow(at: indexPath, animated: true)
         
         ToDoData[indexPath.row].done = !ToDoData[indexPath.row].done
+        
+//        context.delete(ToDoData[indexPath.row])
+//        ToDoData.remove(at: indexPath.row)
+        
+        
+        
         SaveData()
         
         
     }
     func SaveData() {
-        let encoder = PropertyListEncoder()
+        //        let encoder = PropertyListEncoder()
         do{
             try context.save()
-//            let data = try encoder.encode(ToDoData)
-//            try data.write(to: dataFilePath!)
+            //            let data = try encoder.encode(ToDoData)
+            //            try data.write(to: dataFilePath!)
         }catch{
             print("Error in encloding \(error)")
         }
         tableView.reloadData()
     }
-//    func fetchData()  {
-//        do {
-//            if let data = try? Data(contentsOf:dataFilePath!){
-//
-//                let decoder=PropertyListDecoder()
-//
-//                ToDoData = try decoder.decode([EachToDo].self,from :data)
-//
-//            }
-//        }catch{
-//            print("Error in Decoding")
-//
-//        }
-//    }
+    func fetchData()  {
+        do {
+            let request: NSFetchRequest<EachToDo> = EachToDo.fetchRequest()
+            ToDoData = try context.fetch(request)
+            
+            
+        }catch{
+            print("Error in Decoding")
+            
+        }
+    }
 }
 
