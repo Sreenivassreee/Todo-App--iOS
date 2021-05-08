@@ -6,12 +6,15 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategeryViewControllerTableViewController: UITableViewController {
-var CategoryArray = [Categery]()
-
-    var con = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var CategoryArray : Results<Categery>?
+//    do{
+    let realm=try! Realm()
+//    }catch{
+//    print("Error in intializing")
+//    }
     override func viewDidLoad() {
         super.viewDidLoad()
         getData()
@@ -23,10 +26,9 @@ var CategoryArray = [Categery]()
         let action = UIAlertAction(title: "Add", style: .default) { (action) in
             if let t = textfield.text{
                 print(t)
-                let Citem = Categery(context: self.con)
+                let Citem = Categery()
                 Citem.name = t
-                self.CategoryArray.append(Citem)
-                self.saveData()
+                self.saveData(obj: Citem)
                 self.tableView.reloadData()
             }
         }
@@ -39,11 +41,11 @@ var CategoryArray = [Categery]()
         
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return CategoryArray.count
+        return CategoryArray?.count ?? 1
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategeryCell",for: indexPath)
-        cell.textLabel?.text = CategoryArray[indexPath.row].name
+        cell.textLabel?.text = CategoryArray?[indexPath.row].name ?? "NO items are added"
         return cell
     }
     
@@ -55,25 +57,29 @@ var CategoryArray = [Categery]()
         
         if let indexPath = tableView.indexPathForSelectedRow{
           
-            desVC.selectedCategory = CategoryArray[indexPath.row]
-            
+            desVC.selectedCategory = CategoryArray?[indexPath.row]
+             
         }
         
     }
     
     
     
-    func saveData(){
+    func saveData(obj:Categery){
         do{
-            try con.save()
+            try realm.write{
+                realm.add(obj)
+            }
         }catch{
             print("Error is \(error)")
         }
     }
+    
     func getData() {
-        let request:NSFetchRequest<Categery> = Categery.fetchRequest()
+        
         do{
-            CategoryArray = try con.fetch(request)
+            CategoryArray = realm.objects(Categery.self)
+            tableView.reloadData()
 
         }catch{
             print("Error is \(error)")
